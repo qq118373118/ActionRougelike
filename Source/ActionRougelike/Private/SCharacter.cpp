@@ -5,6 +5,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include <DrawDebugHelpers.h>
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -20,9 +22,7 @@ ASCharacter::ASCharacter()
 	CameraComp ->SetupAttachment(SpringArmComp);
 
 	GetCharacterMovement()->bOrientRotationToMovement  = true;
-
 	bUseControllerRotationYaw = false;
-
 }
 
 // Called when the game starts or when spawned
