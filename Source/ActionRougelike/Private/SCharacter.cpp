@@ -22,7 +22,7 @@ ASCharacter::ASCharacter()
 	CameraComp ->SetupAttachment(SpringArmComp);
 
 	GetCharacterMovement()->bOrientRotationToMovement  = true;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = false;  
 }
 
 // Called when the game starts or when spawned
@@ -66,15 +66,58 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
+	//绑定攻击事件
+	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed, this, &ASCharacter::PrimaryAttack);
+
+	//绑定跳跃事件
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::JumpStart);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ASCharacter::JumpStop);
+
 }
 
 void ASCharacter::MoveForward(float Value)
 {
+	FRotator ControlRot = GetControlRotation();
+	ControlRot.Pitch = 0.0f;
+	ControlRot.Roll = 0.0f;
 
-	AddMovementInput(GetActorForwardVector(), Value);
+
+	AddMovementInput(ControlRot.Vector(), Value);
 }
 
 void ASCharacter::MoveRight(float Value)
 {
-	AddMovementInput(GetActorRightVector(), Value);
+
+	FRotator ControlRot = GetControlRotation();
+	ControlRot.Pitch = 0.0f;
+	ControlRot.Roll = 0.0f;
+
+	FVector RightVector =  FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
+
+
+	AddMovementInput(RightVector, Value); 
+}
+
+
+void ASCharacter::PrimaryAttack()
+{
+
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+}
+
+void ASCharacter::JumpStart()
+{
+	bPressedJump = true;
+}
+
+void ASCharacter::JumpStop()
+{
+	bPressedJump = false;
 }
