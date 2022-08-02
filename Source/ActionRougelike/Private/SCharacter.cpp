@@ -73,8 +73,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed, this, &ASCharacter::PrimaryAttack);
 
 	//°ó¶¨ÌøÔ¾ÊÂ¼þ
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::JumpStart);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ASCharacter::JumpStop);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::Jump);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
 }
@@ -138,17 +137,6 @@ void ASCharacter::PrimaryInteract()
 
 }
 
-
-
-void ASCharacter::JumpStart()
-{
-	bPressedJump = true;
-}
-
-void ASCharacter::JumpStop()
-{
-	bPressedJump = false;
-}
 
 
 

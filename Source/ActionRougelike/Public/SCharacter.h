@@ -53,10 +53,6 @@ protected:
 
 	void PrimaryAttack();
 
-	void JumpStart();
-
-	void JumpStop();
-
 	void PrimaryInteract();
 
 public:	
