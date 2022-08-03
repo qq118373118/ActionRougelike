@@ -10,6 +10,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
+class USAttributeComponent;
 
 UCLASS()
 class ACTIONROUGELIKE_API ASCharacter : public ACharacter
@@ -36,13 +37,17 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere);
+	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
-	UPROPERTY(VisibleAnywhere);
+	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 	
+	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	USAttributeComponent* AttributeComp;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
