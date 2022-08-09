@@ -21,6 +21,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category ="Attributes")
 	float Health;
 
+	float HealthMax;
 
 
 public:	
@@ -28,9 +29,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 
+	UFUNCTION(BlueprintCallable)
+	bool IsFullHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealthMax() const;
+
+
 	UPROPERTY(BlueprintAssignable)
-		FOnHealthChanged OnHealthChanged;
+	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-		bool ApplyHealthChange(float Delta);		
+	bool ApplyHealthChange(float Delta);		
 };

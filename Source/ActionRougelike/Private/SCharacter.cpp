@@ -9,6 +9,7 @@
 #include "SInteractionComponent.h"
 #include <SAttributeComponent.h>
 #include "CollisionQueryParams.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -56,6 +57,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::Dash);
 	PlayerInputComponent->BindAction("BlackHoleAttack", IE_Pressed, this, &ASCharacter::BlackHoleAttack);
+
+	HandSocketName = "Muzzle_01";
+
 }
 
 void ASCharacter::MoveForward(float Value)
@@ -84,7 +88,7 @@ void ASCharacter::MoveRight(float Value)
 
 void ASCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
 }
 
@@ -98,7 +102,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 
 void ASCharacter::Dash()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASCharacter::Dash_TimeElapsed, AttackAnimDelay);
 }
 
@@ -112,10 +116,16 @@ void ASCharacter::Dash_TimeElapsed()
 
 void ASCharacter::BlackHoleAttack()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 	GetWorldTimerManager().SetTimer(TimerHandle_BlackHoleAttack, this, &ASCharacter::BlackHoleAttack_TimeElapsed, AttackAnimDelay);
 }
 
+
+void ASCharacter::StartAttackEffects()
+{
+	PlayAnimMontage(AttackAnim);
+	UGameplayStatics::SpawnEmitterAttached(CastingEffect, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
+}
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
@@ -185,9 +195,6 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 			// Fall-back since we failed to find any blocking hit
 			ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
 		}
-
-
-		
 
 		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
 

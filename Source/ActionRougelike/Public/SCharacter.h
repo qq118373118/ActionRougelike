@@ -11,6 +11,7 @@ class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
+class UParticleSystem;
 
 UCLASS()
 class ACTIONROUGELIKE_API ASCharacter : public ACharacter
@@ -30,6 +31,10 @@ protected:
 
 	UPROPERTY(EditAnywhere,Category="Attack")
 		UAnimMontage* AttackAnim;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+		FName HandSocketName;
+		
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_Dash;
@@ -62,6 +67,9 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	USAttributeComponent* AttributeComp;
 
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+		UParticleSystem* CastingEffect;
 	
 
 	void MoveForward(float Value);
@@ -77,6 +85,9 @@ protected:
 	void Dash();
 
 	void BlackHoleAttack();
+
+	void StartAttackEffects();
+
 
 	UFUNCTION()
 		void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
