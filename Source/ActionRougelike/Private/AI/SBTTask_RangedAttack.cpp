@@ -7,6 +7,13 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "SAttributeComponent.h"
 
+
+USBTTask_RangedAttack::USBTTask_RangedAttack()
+{
+	MaxBulletSpread = 2.0f;
+}
+
+
 EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* MyController = OwnerComp.GetAIOwner();
@@ -38,6 +45,11 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 		FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 		FRotator MuzzleRotation = Direction.Rotation();
 
+
+		MuzzleRotation.Pitch += FMath::RandRange(-MaxBulletSpread, MaxBulletSpread);
+		MuzzleRotation.Yaw+= FMath::RandRange(-MaxBulletSpread, MaxBulletSpread);
+
+
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		Params.Instigator = MyPawn;
@@ -52,3 +64,5 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 	return EBTNodeResult::Failed;
 
 }
+
+
