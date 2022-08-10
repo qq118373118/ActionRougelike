@@ -7,7 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
-
+#include "Components/AudioComponent.h"
 
 ASProjectileBase::ASProjectileBase()
 {
@@ -18,6 +18,12 @@ ASProjectileBase::ASProjectileBase()
 
     EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
     EffectComp->SetupAttachment(RootComponent);
+
+    AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+    AudioComp->SetupAttachment(RootComponent);
+
+
+
     EffectComp->OnSystemFinished.AddDynamic(this,&ASProjectileBase::OnDeactivated);
 
     MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMoveComp");
