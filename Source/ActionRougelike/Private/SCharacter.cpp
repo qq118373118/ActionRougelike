@@ -32,7 +32,7 @@ ASCharacter::ASCharacter()
 
 	AttackAnimDelay = 0.2f;
 
-
+	TimeToHitParamName = "TimeToHit";
 }
 
 
@@ -134,6 +134,12 @@ void ASCharacter::StartAttackEffects()
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+	if (Delta < 0.0f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+	}
+
+
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		APlayerController* PC = Cast <APlayerController>(GetController());
@@ -146,6 +152,11 @@ void ASCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+}
+
+FVector ASCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 void ASCharacter::BlackHoleAttack_TimeElapsed()

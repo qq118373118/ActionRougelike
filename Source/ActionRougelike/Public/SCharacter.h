@@ -55,6 +55,9 @@ public:
 
 protected:
 
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+		FName TimeToHitParamName;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
@@ -90,10 +93,11 @@ protected:
 
 
 	UFUNCTION()
-		void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
 	virtual void PostInitializeComponents() override;
 
+	virtual FVector GetPawnViewLocation() const override;
 
 public:	
 	
