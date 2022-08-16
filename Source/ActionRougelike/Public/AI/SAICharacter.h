@@ -10,6 +10,7 @@ class UPawnSensingComponent;
 class USAttributeComponent;
 class UUserWidget;
 class USWorldUserWidget;
+class USActionComponent;
 
 UCLASS()
 class ACTIONROUGELIKE_API ASAICharacter : public ACharacter
@@ -36,6 +37,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Component")
 		UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Component")
+	USActionComponent* ActionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USAttributeComponent* AttributeComp;
