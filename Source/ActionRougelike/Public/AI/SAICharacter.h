@@ -44,7 +44,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USAttributeComponent* AttributeComp;
 	UFUNCTION()
-		void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);

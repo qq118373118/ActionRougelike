@@ -34,6 +34,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 		float SpawnTimerInterval;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
+		int32 CreditsPerKill;
+
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
 

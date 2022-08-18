@@ -9,7 +9,7 @@
 
 class USphereComponent;
 
-UCLASS()
+UCLASS(ABSTRACT)
 class ACTIONROUGELIKE_API ASPowerupActor : public AActor,public ISGameplayInterface
 {
 	GENERATED_BODY()
@@ -26,7 +26,7 @@ protected:
 	FTimerHandle TimerHandle_RespawnTimer;
 
 	UFUNCTION()
-		void ShowPowerup();
+	void ShowPowerup();
 
 	void HideAndCooldownPowerup();
 
@@ -34,6 +34,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 		USphereComponent* SphereComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		UStaticMeshComponent* MeshComp;
 
 public:
 

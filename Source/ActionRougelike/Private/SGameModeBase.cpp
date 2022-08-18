@@ -10,6 +10,7 @@
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
 #include "SCharacter.h"
+#include "SPlayerState.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"),true,TEXT("Enable spawing of bots via timer."),ECVF_Cheat);
@@ -17,6 +18,7 @@ static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"),true,TEXT("
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
+	CreditsPerKill = 20;
 }
 
 void ASGameModeBase::StartPlay()
@@ -136,6 +138,15 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay,false);
 	}
 
-
+	// Give Credits for kill
+	APawn* KillerPawn = Cast<APawn>(Killer);
+	if (KillerPawn)
+	{
+		ASPlayerState* PS = KillerPawn->GetPlayerState<ASPlayerState>();
+		if (PS)
+		{
+			PS->AddCredits(CreditsPerKill);
+		}
+	}
 
 }

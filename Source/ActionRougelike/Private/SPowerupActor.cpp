@@ -3,18 +3,20 @@
 
 #include "SPowerupActor.h"
 #include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 ASPowerupActor::ASPowerupActor()
 {
-    SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
+	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
+	SphereComp->SetCollisionProfileName("Powerup");
+	RootComponent = SphereComp;
 
-    SphereComp->SetCollisionProfileName("Powerup");
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetupAttachment(RootComponent);
 
-    RootComponent = SphereComp;
-
-    RespawnTime = 10.0f;
-
+	RespawnTime = 10.0f;
 }
 
 

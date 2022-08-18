@@ -3,15 +3,13 @@
 
 #include "SPowerup_HealthPotion.h"
 #include "SAttributeComponent.h"
-
+#include "SPlayerState.h"
 
 ASPowerup_HealthPotion::ASPowerup_HealthPotion()
 {
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	MeshComp->SetupAttachment(RootComponent);
+	CreditsCost = 50;
 
 }
 
@@ -27,9 +25,13 @@ void ASPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 	if (ensure(AttributeComp) && !AttributeComp->IsFullHealth())
 	{
-		if (AttributeComp->ApplyHealthChange(this,AttributeComp->GetHealthMax()))
+
+		if (ASPlayerState* PS = InstigatorPawn->GetPlayerState<ASPlayerState>())
 		{
-			HideAndCooldownPowerup();
+			if (PS->RemoveCredits(CreditsCost) && AttributeComp->ApplyHealthChange(this, AttributeComp->GetHealthMax()))
+			{
+				HideAndCooldownPowerup();
+			}
 		}
 	}
 }

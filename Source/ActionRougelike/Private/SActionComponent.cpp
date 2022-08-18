@@ -18,7 +18,7 @@ void USActionComponent::BeginPlay()
 	
 	for (TSubclassOf<USAction> ActionClass : DefaultActions)
 	{
-		AddAction(ActionClass);
+		AddAction(GetOwner(),ActionClass);
 	}
 
 }
@@ -34,7 +34,7 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 }
 
-void USActionComponent::AddAction(TSubclassOf<USAction> ActionClass)
+void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
 {
 	if (!ensure(ActionClass))
 	{
@@ -48,6 +48,22 @@ void USActionComponent::AddAction(TSubclassOf<USAction> ActionClass)
 		Actions.Add(NewAction);
 	}
 
+	if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)) )
+	{
+		NewAction->StartAction(Instigator);
+	}
+
+}
+
+void USActionComponent::RemoveAction(USAction* ActionToRemove)
+{
+	//写的这么复杂是为了以下情况报错的时候会给个提示，同时又不影响这个函数逻辑和运行
+	if (!ensure(ActionToRemove && !ActionToRemove->IsRunning()))
+	{
+		return;
+	}
+
+	Actions.Remove(ActionToRemove);
 }
 
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
