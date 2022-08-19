@@ -23,6 +23,11 @@ public:
 
 protected:
 	
+	//Unreliable-不可靠的，可能会丢包，也不会重发。
+	//Reliable-可靠的，保证数据包到达，要收到确认报文
+	UFUNCTION(Server, Reliable )
+	void ServerInteract(AActor * InFocus);
+
 	void FindBestInteractable();
 
 	virtual void BeginPlay() override;

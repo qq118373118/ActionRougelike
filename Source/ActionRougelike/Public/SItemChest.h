@@ -25,6 +25,14 @@ public:
 	ASItemChest();
 
 protected:
+	//ReplicatedUsing 一般出现在函数的声明中,表示当该变量在服务器上变化时,会调用事先绑定好的回调函数(函数名一般以OnRep开头)
+	//需要注意的是服务端不会自动调用绑定好的该回调函数,此时需要通过代码手动调用.
+	//绑定方式如下面的代码一样
+	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened",BlueprintReadOnly)
+		bool bLidOpened;
+
+	UFUNCTION()
+	void OnRep_LidOpened();
 
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* BaseMesh;
@@ -32,11 +40,5 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 		UStaticMeshComponent* LidMesh;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

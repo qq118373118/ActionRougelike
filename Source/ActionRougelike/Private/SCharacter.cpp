@@ -154,7 +154,6 @@ void ASCharacter::PrimaryInteract()
 	if (InteractionComp) {
 		InteractionComp->PrimaryInteract();
 	}
-
 }
 
 
