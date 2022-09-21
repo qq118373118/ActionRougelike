@@ -25,11 +25,18 @@ public:
 
 
 protected:
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category ="Attributes")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Replicated,Category ="Attributes")
 	float Health;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float HealthMax;
 
+	//UPROPERTY(ReplicatedUsing="")
+	//bool bIsAlive;
+
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticasHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 public:	
 

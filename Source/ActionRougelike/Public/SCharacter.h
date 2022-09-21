@@ -26,7 +26,7 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
-		FName TimeToHitParamName;
+	FName TimeToHitParamName;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;

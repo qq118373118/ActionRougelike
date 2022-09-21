@@ -17,6 +17,9 @@ ASPowerupActor::ASPowerupActor()
 	MeshComp->SetupAttachment(RootComponent);
 
 	RespawnTime = 10.0f;
+
+	//当服务器生成一个对象时会通知其他的客户端也生成一个。
+	SetReplicates(true);
 }
 
 
