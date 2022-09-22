@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SAttributeComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp,float, NewHealth, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAttributeChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp,float, NewValue, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROUGELIKE_API USAttributeComponent : public UActorComponent
@@ -31,6 +31,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float HealthMax;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+		float Rage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+		float RageMax;
 	//UPROPERTY(ReplicatedUsing="")
 	//bool bIsAlive;
 
@@ -51,11 +56,19 @@ public:
 
 
 	UPROPERTY(BlueprintAssignable)
-	FOnHealthChanged OnHealthChanged;
+	FOnAttributeChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
 
+	UPROPERTY(BlueprintAssignable, Category = "Attributes")
+	FOnAttributeChanged OnRageChanged;
+
+	UFUNCTION(BlueprintCallable)
+	float GetRage() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyRage(AActor* InstigatorActor, float Delta);
 
 	UFUNCTION(BlueprintCallable)
 	bool Kill(AActor* InstigatorActor);

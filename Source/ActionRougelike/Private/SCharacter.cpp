@@ -126,6 +126,9 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	if (Delta < 0.0f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+
+		float RageDelta = FMath::Abs(Delta);
+		AttributeComp->ApplyRage(InstigatorActor, RageDelta);
 	}
 
 

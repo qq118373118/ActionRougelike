@@ -25,6 +25,8 @@ ASAICharacter::ASAICharacter()
 
 	TimeToHitParamName = "TimeToHit";
 
+	TargetActorKey = "TargetActor";
+
 }
 
 
@@ -95,12 +97,32 @@ void ASAICharacter::SetTargetActor(AActor* NewTarget)
 }
 
 
+AActor* ASAICharacter::GetTargetActor() const
+{
+	AAIController* AIC = Cast<AAIController>(GetController());
+	if (AIC)
+	{
+		return Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject(TargetActorKey));
+	}
+
+	return nullptr;
+}
+
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	
-	SetTargetActor(Pawn);
-	
-	DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr,FColor::White, 4.0f, true);
+	if (GetTargetActor() != Pawn)
+	{
+		SetTargetActor(Pawn);
+
+		USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), SpottedWidgetClass);
+
+		if (NewWidget)
+		{
+			NewWidget->AttachedActor = this;
+			NewWidget->AddToViewport(10);
+		}
+	}
 
 }
 
