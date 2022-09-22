@@ -10,7 +10,7 @@
 class UBehaviorTree;
 
 /**
- * 
+ * AI Controller只存在于服务器中。只有服务器存在AIController的实例
  */
 UCLASS()
 class ACTIONROUGELIKE_API ASAIController : public AAIController
