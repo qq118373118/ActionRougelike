@@ -6,12 +6,14 @@
 
 static void LogOnScreen(UObject* WorldContext, FString Msg, FColor Color = FColor::White, float Duration = 5.0f)
 {
-	if (!ensure(WorldContext)) {
+	if (!ensure(WorldContext)) 
+	{
 		return;
 	}
 
 	UWorld* World = WorldContext->GetWorld();
-	if (!ensure(World)) {
+	if (!ensure(World)) 
+	{
 		return;
 	}
 

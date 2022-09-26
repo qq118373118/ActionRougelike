@@ -8,6 +8,7 @@
 #include "SActionComponent.generated.h"
 
 class USAction;
+class UMyObject;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROUGELIKE_API USActionComponent : public UActorComponent
@@ -46,15 +47,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Actions")
 		TArray<TSubclassOf<USAction>> DefaultActions;
 
+	//这个变量是要被复制的
 	UPROPERTY(Replicated)
 	TArray<USAction*> Actions;
+
+	
+
 
 	virtual void BeginPlay() override;
 
 public:	
 
 
-	bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

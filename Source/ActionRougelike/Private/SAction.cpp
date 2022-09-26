@@ -83,6 +83,7 @@ USActionComponent* USAction::GetOwningComponent() const
 
 void USAction::OnRep_IsRunning()
 {
+	
 	if (bIsRunning)
 	{
 		StartAction(nullptr);

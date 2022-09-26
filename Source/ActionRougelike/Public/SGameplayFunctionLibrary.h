@@ -15,9 +15,11 @@ class ACTIONROUGELIKE_API USGameplayFunctionLibrary : public UBlueprintFunctionL
 	GENERATED_BODY()
 	
 public:
+	//受到伤害
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		static bool ApplyDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmout);
 
+	//受到定向伤害
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		static bool ApplyDirectionalDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmout, const FHitResult& HitResult);
 

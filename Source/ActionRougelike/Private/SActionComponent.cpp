@@ -10,18 +10,21 @@
 USActionComponent::USActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	//设置同步，如果不设置同步，技能就没办法同步
+	SetIsReplicatedByDefault(true);
+	
 }
-
-
 
 
 void USActionComponent::BeginPlay()
 {
-	Super::BeginPlay();
 	
-	//只在服务器上进行复制
+
+	//只在服务器上进行技能的注册
 	if (GetOwner()->HasAuthority())
 	{
+
 		for (TSubclassOf<USAction> ActionClass : DefaultActions)
 		{
 			AddAction(GetOwner(), ActionClass);
@@ -46,7 +49,7 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			*GetNameSafe(GetOwner()),
 			*Action->ActionName.ToString(),
 			Action->IsRunning() ? TEXT("true") : TEXT("false"),
-			*GetNameSafe(Action->GetOuter()));
+			*GetNameSafe(GetOuter()));
 		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
 	}
 }
@@ -62,7 +65,6 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 
 	if (ensure(NewAction))
 	{
-
 		NewAction->Initialize(this);
 
 		Actions.Add(NewAction);
@@ -100,11 +102,14 @@ USAction* USActionComponent::GetAction(TSubclassOf<USAction> ActionClass) const
 
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
+	//遍历组件中存在的技能
 	for (USAction* Action : Actions)
 	{
+		//判断这个技能是否存在
 		if (Action && Action->ActionName == ActionName)
 		{
 
+			//如果不能释放技能，打印提示信息
 			if (!Action->CanStart(Instigator))
 			{
 
@@ -113,12 +118,14 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				continue;
 			}
 
+			//如果是客户端就执行
 			if (!GetOwner()->HasAuthority())
 			{
+				//这个函数是个RPC调用，因用Server修饰，所以客户端请求服务器执行该函数，客户端本身不执行。
 				ServerStartAction(Instigator, ActionName);
 			}
 
-
+			//客户端会在本地执行一次
 			Action->StartAction(Instigator);
 			return true;
 		}
@@ -154,6 +161,10 @@ void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FNa
 bool USActionComponent::ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags)
 {
 	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+
+	UE_LOG(LogTemp, Warning, TEXT("The boolean value is %s"), (WroteSomething ? TEXT("true") : TEXT("false")));
+
+
 	for (USAction* Action : Actions)
 	{
 		if (Action)
@@ -161,6 +172,8 @@ bool USActionComponent::ReplicateSubobjects(class UActorChannel* Channel, class 
 			WroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
 		}
 	}
+
+
 	return WroteSomething;
 }
 
@@ -171,3 +184,4 @@ void USActionComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 
 	DOREPLIFETIME(USActionComponent, Actions);
 }
+

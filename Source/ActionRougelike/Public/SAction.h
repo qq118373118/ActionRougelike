@@ -19,20 +19,22 @@ class ACTIONROUGELIKE_API USAction : public UObject
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(Replicated)
-	USActionComponent* ActionComp;
+	
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		USActionComponent* GetOwningComponent() const;
+	USActionComponent* GetOwningComponent() const;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
-		FGameplayTagContainer GrantsTags;
+	FGameplayTagContainer GrantsTags;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
-		FGameplayTagContainer BlockedTags;
+	FGameplayTagContainer BlockedTags;
 
-	UPROPERTY(ReplicatedUsing="OnRep_IsRunning")
+	UPROPERTY(ReplicatedUsing = "OnRep_IsRunning")
 	bool bIsRunning;
+
+	UPROPERTY(Replicated)
+	USActionComponent* ActionComp;
 
 	UFUNCTION()
 	void OnRep_IsRunning();
