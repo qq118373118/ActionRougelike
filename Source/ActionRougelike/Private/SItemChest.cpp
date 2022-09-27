@@ -5,11 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Net/UnrealNetwork.h"
 
-void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
-{
-	bLidOpened = !bLidOpened;
-	OnRep_LidOpened();
-}
+
 
 // Sets default values
 ASItemChest::ASItemChest()
@@ -26,6 +22,12 @@ ASItemChest::ASItemChest()
 	SetReplicates(true);
 }
 
+
+void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
+{
+	bLidOpened = !bLidOpened;
+	OnRep_LidOpened();
+}
 
 void ASItemChest::OnRep_LidOpened()
 {

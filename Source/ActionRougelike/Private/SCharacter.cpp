@@ -91,7 +91,7 @@ void ASCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value); 
 }
 
-
+//³å´Ì
 void ASCharacter::SprintStart()
 {
 	ActionComp->StartActionByName(this, "Sprint");
@@ -136,6 +136,8 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	{
 		APlayerController* PC = Cast <APlayerController>(GetController());
 		DisableInput(PC);
+
+		SetLifeSpan(5.0f);
 	}
 }
 

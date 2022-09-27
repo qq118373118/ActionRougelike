@@ -9,6 +9,7 @@
 
 USActionComponent::USActionComponent()
 {
+
 	PrimaryComponentTick.bCanEverTick = true;
 
 	//设置同步，如果不设置同步，技能就没办法同步
@@ -17,9 +18,10 @@ USActionComponent::USActionComponent()
 }
 
 
-void USActionComponent::BeginPlay()
-{
-	
+
+void USActionComponent::BeginPlay(){
+
+	Super::BeginPlay();
 
 	//只在服务器上进行技能的注册
 	if (GetOwner()->HasAuthority())
@@ -44,12 +46,10 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	for (USAction* Action : Actions)
 	{
-		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::Red;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"),
-			*GetNameSafe(GetOwner()),
-			*Action->ActionName.ToString(),
-			Action->IsRunning() ? TEXT("true") : TEXT("false"),
-			*GetNameSafe(GetOuter()));
+		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"),*GetNameSafe(GetOwner()),*GetNameSafe(Action));
+
 		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
 	}
 }
@@ -60,6 +60,15 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 	{
 		return;
 	}
+
+	//
+	if (!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client attempting to AddActuib.[Class:%s]"), * GetNameSafe(ActionClass));
+		return;
+	}
+
+
 
 	USAction* NewAction = NewObject<USAction>(GetOwner(), ActionClass);
 
@@ -143,6 +152,15 @@ bool USActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 
 			if (Action->IsRunning())
 			{
+
+				//如果是客户端就执行
+				if (!GetOwner()->HasAuthority())
+				{
+					//这个函数是个RPC调用，因用Server修饰，所以客户端请求服务器执行该函数，客户端本身不执行。
+					ServerStopAction(Instigator, ActionName);
+				}
+
+
 				Action->StopAction(Instigator);
 				return true;
 			}
@@ -158,12 +176,16 @@ void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FNa
 } 
 
 
+void USActionComponent::ServerStopAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StopActionByName(Instigator, ActionName);
+}
+
+
+
 bool USActionComponent::ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags)
 {
 	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
-
-	UE_LOG(LogTemp, Warning, TEXT("The boolean value is %s"), (WroteSomething ? TEXT("true") : TEXT("false")));
-
 
 	for (USAction* Action : Actions)
 	{
@@ -172,7 +194,6 @@ bool USActionComponent::ReplicateSubobjects(class UActorChannel* Channel, class 
 			WroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
 		}
 	}
-
 
 	return WroteSomething;
 }
