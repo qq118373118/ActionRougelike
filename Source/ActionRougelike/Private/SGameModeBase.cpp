@@ -11,6 +11,11 @@
 #include "DrawDebugHelpers.h"
 #include "SCharacter.h"
 #include "SPlayerState.h"
+#include "SSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
+#include <SGameplayInterface.h>
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"),true,TEXT("Enable spawing of bots via timer."),ECVF_Cheat);
@@ -19,15 +24,53 @@ ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
 	CreditsPerKill = 20;
+
+	PlayerStateClass = ASPlayerState::StaticClass();
+
+	SlotName = "SaveGame01";
+
+}
+
+void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessgawe)
+{
+	Super::InitGame(MapName, Options, ErrorMessgawe);
+
+	LoadSaveGame();
+
+
 }
 
 void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 	GetWorldTimerManager().SetTimer(TImerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+
+	//作业遗漏的代码
+	/*if (ensure(PowerupClasses.Num() > 0))
+	{
+		UEnvQueryInstanceBlueprintWrapper* QuerryInstance = UEnvQueryManager::RunEQSQuery(this, PowerupClasses, this, EEnvQueryRunMode::AllMatching, nullptr);
+		if (ensure(QuerryInstance))
+		{
+			QuerryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnPowerupSpawnQuerryCompleted);
+		}
+	}*/
+
 }
 
 
+//这个函数是重载的，应该是属于框架里的，所以是什么意思呢？？
+void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ASPlayerState* PS = NewPlayer->GetPlayerState<ASPlayerState>();
+	if (PS)
+	{
+		PS->LoadPlayerState(CurrentSaveGame);
+	}
+
+
+}
 
 void ASGameModeBase::KillAll()
 {
@@ -148,5 +191,119 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 			PS->AddCredits(CreditsPerKill);
 		}
 	}
+
+}
+
+
+void ASGameModeBase::WriteSaveGame()
+{
+	//获取全部的玩家
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ASPlayerState* PS = Cast<ASPlayerState>(GameState->PlayerArray[i]);
+		if (PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+			break;//单人游戏
+		}
+	}
+
+	//清理上一次存档保存的Actor信息
+	CurrentSaveGame->SavedActors.Empty();
+
+	//获取场景中所有的Actor的迭代器
+	for(FActorIterator It(GetWorld()) ; It;++It)
+	{
+		AActor* Actor = *It;
+
+		//只对"gameplay actors"感兴趣（过滤灯光、地板等）
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		//将对应的actor的名字和transform记录下来，并且存到当前存档的SavedActors中
+		FActorSaveData ActorData;
+		ActorData.ActorName = Actor->GetName();
+		ActorData.Transform = Actor->GetTransform();
+
+
+
+		//pass the array to fill with data from actor
+		FMemoryWriter MemWriter(ActorData.ByteData);
+
+		
+		FObjectAndNameAsStringProxyArchive Ar(MemWriter,true);
+		//寻找只有 UPROPERTY(SaveGame)的变量
+		Ar.ArIsSaveGame = true;
+		
+		//Converts Actor's SaveGame UPROPERTIES into binary array
+		Actor->Serialize(Ar);
+
+		CurrentSaveGame->SavedActors.Add(ActorData);
+	}
+
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void ASGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Faild to load SaveGame Data."));
+			return;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Loaded SaveGame Data."));
+
+		for (FActorIterator It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			//只对"gameplay actors"感兴趣（过滤灯光、地板等）
+			if (!Actor->Implements<USGameplayInterface>())
+			{
+				continue;
+			}
+
+
+			//匹配场景中的Actor并且设置保存的Transform
+			for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
+			{
+				if (ActorData.ActorName == Actor->GetName())
+				{
+					Actor->SetActorTransform(ActorData.Transform);
+
+
+					FMemoryReader MemReader(ActorData.ByteData);
+
+
+					FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
+					//寻找只有 UPROPERTY(SaveGame)的变量
+					Ar.ArIsSaveGame = true;
+
+					//Converts binary array back into actor's variables 
+					Actor->Serialize(Ar);
+
+					ISGameplayInterface::Execute_OnActorLoaded(Actor);
+
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::CreateSaveGameObject(USSaveGame::StaticClass()));
+		UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data."));
+
+	}
+
+
+
 
 }

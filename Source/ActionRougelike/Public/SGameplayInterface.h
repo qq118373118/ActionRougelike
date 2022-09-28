@@ -26,4 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
 	void Interact(APawn * InstigatorPawn);
 
+	//从游戏存档读取状态后调用，用来恢复保存时的状态。
+	UFUNCTION(BlueprintNativeEvent)
+	void OnActorLoaded();
+
 };
