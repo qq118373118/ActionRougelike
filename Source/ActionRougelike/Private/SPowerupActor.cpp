@@ -4,6 +4,7 @@
 #include "SPowerupActor.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASPowerupActor::ASPowerupActor()
@@ -18,6 +19,8 @@ ASPowerupActor::ASPowerupActor()
 
 	RespawnTime = 10.0f;
 
+	bIsActive = true;
+
 	//当服务器生成一个对象时会通知其他的客户端也生成一个。
 	SetReplicates(true);
 }
@@ -27,6 +30,7 @@ void ASPowerupActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 
 }
+
 
 void ASPowerupActor::ShowPowerup()
 {
@@ -43,8 +47,23 @@ void ASPowerupActor::HideAndCooldownPowerup()
 void ASPowerupActor::SetPowerupState(bool bNewIsActive) 
 {
 
-    SetActorEnableCollision(bNewIsActive);
+	bIsActive = bNewIsActive;
+	OnRep_IsActive();
 
-    RootComponent->SetVisibility(bNewIsActive, true);
+}
 
+
+void ASPowerupActor::OnRep_IsActive()
+{
+	SetActorEnableCollision(bIsActive);
+	// 设置可见性
+	RootComponent->SetVisibility(bIsActive, true);
+}
+
+
+void ASPowerupActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPowerupActor, bIsActive);
 }

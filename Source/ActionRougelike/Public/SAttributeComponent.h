@@ -43,6 +43,7 @@ protected:
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticasHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
+
 public:	
 
 	UFUNCTION(BlueprintCallable)

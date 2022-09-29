@@ -52,7 +52,7 @@ protected:
 	UPROPERTY(Replicated)
 	USActionComponent* ActionComp;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnRep_RepData();
 
 

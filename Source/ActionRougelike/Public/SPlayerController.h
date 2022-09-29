@@ -9,6 +9,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPawnChanged, APawn*, NewPawn);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateChanged, APlayerState*, NewPlayerState);
+
 /**
  * 
  */
@@ -22,8 +24,18 @@ class ACTIONROUGELIKE_API ASPlayerController : public APlayerController
 protected:
 
 	UPROPERTY(BlueprintAssignable)
+	FOnPlayerStateChanged OnPlayerStateReceived;
+
+	UPROPERTY(BlueprintAssignable)
 	FOnPawnChanged OnPawnChanged;
 
 	virtual void SetPawn(APawn* InPawn) override;
+
+	virtual void BeginPlayingState() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BlueprintBeginPlayingState();
+
+	void OnRep_PlayerState() override;
 
 };

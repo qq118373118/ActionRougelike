@@ -83,7 +83,6 @@ USActionComponent* USAction::GetOwningComponent() const
 
 void USAction::OnRep_RepData()
 {
-	
 	if (RepData.bIsRunning)
 	{
 		StartAction(RepData.Instigator);

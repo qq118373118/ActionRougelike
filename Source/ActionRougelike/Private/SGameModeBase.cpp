@@ -61,7 +61,6 @@ void ASGameModeBase::StartPlay()
 //这个函数是重载的，应该是属于框架里的，所以是什么意思呢？？
 void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
 	ASPlayerState* PS = NewPlayer->GetPlayerState<ASPlayerState>();
 	if (PS)
@@ -69,6 +68,7 @@ void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* N
 		PS->LoadPlayerState(CurrentSaveGame);
 	}
 
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
 }
 

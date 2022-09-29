@@ -20,6 +20,13 @@ public:
 
 protected:
 
+	UPROPERTY(ReplicatedUsing = "OnRep_IsActive")
+	bool bIsActive;
+
+	UFUNCTION()
+	void OnRep_IsActive();
+
+
 	UPROPERTY(EditAnywhere, Category = "Powerup")
 		float RespawnTime;
 
