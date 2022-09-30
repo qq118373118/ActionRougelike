@@ -53,7 +53,7 @@ float USAttributeComponent::GetHealth() const
 bool USAttributeComponent::ApplyHealthChange(AActor * InstigatorActor,float Delta)
 {
 
-	if (!GetOwner()->CanBeDamaged())
+	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
 	{
 		return false;
 	}
@@ -67,9 +67,11 @@ bool USAttributeComponent::ApplyHealthChange(AActor * InstigatorActor,float Delt
 
 	float OldHealth = Health;
 	float NewHealth  = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
+
 	float ActualDelta = NewHealth - OldHealth;
+
 	//如果是服务器则执行
-	if (!GetOwner()->HasAuthority())
+	if (GetOwner()->HasAuthority())
 	{
 		Health = NewHealth;
 		if (ActualDelta != 0.0f)

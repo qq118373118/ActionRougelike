@@ -36,6 +36,11 @@ class ACTIONROUGELIKE_API USAction : public UObject
 	
 protected:
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+		UTexture2D* Icon;
+
+	UPROPERTY(Replicated)
+	USActionComponent* ActionComp;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	USActionComponent* GetOwningComponent() const;
@@ -50,7 +55,7 @@ protected:
 	FActionRepData RepData;
 
 	UPROPERTY(Replicated)
-	USActionComponent* ActionComp;
+	float TimeStarted;
 
 	UFUNCTION(BlueprintCallable)
 	void OnRep_RepData();

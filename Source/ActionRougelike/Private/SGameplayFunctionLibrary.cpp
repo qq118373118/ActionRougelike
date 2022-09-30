@@ -16,7 +16,7 @@ bool USGameplayFunctionLibrary::ApplyDamage(AActor* DamageCauser, AActor* Target
 
 bool USGameplayFunctionLibrary::ApplyDirectionalDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmout, const FHitResult& HitResult)
 {
-if (ApplyDamage(DamageCauser, TargetActor, DamageAmout))
+	if(ApplyDamage(DamageCauser, TargetActor, DamageAmout))
 	{
 		UPrimitiveComponent* HitComp = HitResult.GetComponent();
 		if (HitComp && HitComp->IsSimulatingPhysics(HitResult.BoneName))

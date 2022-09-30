@@ -21,6 +21,7 @@ void USAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 	if (Character)
 	{
 		Character->PlayAnimMontage(AttackAnim);
+		//产生施法特效
 		UGameplayStatics::SpawnEmitterAttached(CastingEffect, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 
 
