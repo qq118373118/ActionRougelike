@@ -32,6 +32,11 @@ void ASPowerupActor::Interact_Implementation(APawn* InstigatorPawn)
 }
 
 
+FText ASPowerupActor::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
+
 void ASPowerupActor::ShowPowerup()
 {
     SetPowerupState(true);
