@@ -16,6 +16,10 @@
 #include "GameFramework/GameStateBase.h"
 #include <SGameplayInterface.h>
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "SMonsterData.h"
+#include "../ActionRougelike.h"
+#include <SActionComponent.h>
+#include "Engine/AssetManager.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"),true,TEXT("Enable spawing of bots via timer."),ECVF_Cheat);
@@ -56,7 +60,6 @@ void ASGameModeBase::StartPlay()
 	}*/
 
 }
-
 
 //这个函数是重载的，应该是属于框架里的，所以是什么意思呢？？
 void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
@@ -148,13 +151,62 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 
 	if (Locations.IsValidIndex(0))
 	{
-		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 
-		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
+		TArray<FMonsterInfoRow*> Rows;
+
+		MonsterTable->GetAllRows("", Rows);
+
+		//获取随机的数据
+		int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
+
+		FMonsterInfoRow* SelectedRow = Rows[RandomIndex];
+
+		UAssetManager* Manager = UAssetManager::GetIfValid();
+
+		if (Manager)
+		{
+			TArray<FName> Bundles;
+			FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, &ASGameModeBase::OnMonsterLoaded, SelectedRow->MonsterId,Locations[0]);
+			Manager->LoadPrimaryAsset(SelectedRow->MonsterId, Bundles, Delegate);
+		}
+
+
+		
 
 	}
 }
 
+void ASGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation)
+{
+
+	LogOnScreen(this, "Finished Loading.", FColor::Green);
+
+	UAssetManager* Manager = UAssetManager::GetIfValid();
+
+	if (Manager)
+	{
+		USMonsterData* MonsterData = Cast< USMonsterData>(Manager->GetPrimaryAssetObject(LoadedId));
+
+		if (MonsterData)
+		{
+			AActor* NewBot = GetWorld()->SpawnActor<AActor>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator);
+
+			if (NewBot)
+			{
+				LogOnScreen(this, FString::Printf(TEXT("Spawned enemy:%s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(MonsterData)));
+
+				USActionComponent* ActionComp = Cast<USActionComponent>(NewBot->GetComponentByClass(USActionComponent::StaticClass()));
+				if (ActionComp)
+				{
+					for (TSubclassOf<USAction> ActionClass : MonsterData->Actions)
+					{
+						ActionComp->AddAction(NewBot, ActionClass);
+					}
+				}
+			}
+		}
+	}
+}
 
 void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)
 {
@@ -193,7 +245,6 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	}
 
 }
-
 
 void ASGameModeBase::WriteSaveGame()
 {

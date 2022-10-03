@@ -5,16 +5,50 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
+#include "Engine/DataTable.h"
 #include "SGameModeBase.generated.h"
+
 
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
 class USSaveGame;
+class UDataTable;
+class USMonsterData;
+
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow: public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+
+	FMonsterInfoRow()
+	{
+		Weight = 1.0f;
+		SpawnCost = 5.0f;
+		KillReward = 20.0f;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FPrimaryAssetId MonsterId;
+	//TSubclassOf<AActor> MonsterClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float KillReward;
+
+};
 
 /**
  * 
  */
+
 UCLASS()
 class ACTIONROUGELIKE_API ASGameModeBase : public AGameModeBase
 {
@@ -22,18 +56,20 @@ class ACTIONROUGELIKE_API ASGameModeBase : public AGameModeBase
 	
 protected:
 
-
 	FString SlotName;
 
 	UPROPERTY()
 	USSaveGame* CurrentSaveGame;
 
-	UPROPERTY(EditDefaultsOnly,Category = "AI")
-	TSubclassOf<AActor> MinionClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UDataTable* MonsterTable;
+
+	//UPROPERTY(EditDefaultsOnly,Category = "AI")
+	//TSubclassOf<AActor> MinionClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UCurveFloat* DiffcultyCurve;
@@ -52,9 +88,11 @@ protected:
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
+
+	void OnMonsterLoaded(FPrimaryAssetId LoadedId,FVector SpawnLocation);
+
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController * Controller);
-
 
 public:
 
@@ -67,13 +105,10 @@ public:
 
 	virtual void StartPlay() override;
 
-
 	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
-
 
 	UFUNCTION(Exec)
 	void KillAll();
-
 
 	//Ð´£¨´æ£©µµ
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
@@ -81,7 +116,5 @@ public:
 
 	//¶Áµµ
 	void LoadSaveGame();
-
-
 
 };
