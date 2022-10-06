@@ -7,6 +7,9 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/ActorChannel.h"
 
+
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_STANFORD);
+
 USActionComponent::USActionComponent()
 {
 
@@ -36,6 +39,21 @@ void USActionComponent::BeginPlay(){
 
 
 
+
+void USActionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+
+	TArray<USAction*> ActiosCopy = Actions;
+	for (USAction* Action : ActiosCopy)
+	{
+		if (Action && Action->IsRunning())
+		{
+			Action->StopAction(GetOwner());
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
 
 void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -111,6 +129,9 @@ USAction* USActionComponent::GetAction(TSubclassOf<USAction> ActionClass) const
 
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
+
+	SCOPE_CYCLE_COUNTER(STAT_StartActionByName);
+
 	//遍历组件中存在的技能
 	for (USAction* Action : Actions)
 	{
@@ -133,6 +154,8 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				//这个函数是个RPC调用，因用Server修饰，所以客户端请求服务器执行该函数，客户端本身不执行。
 				ServerStartAction(Instigator, ActionName);
 			}
+
+			TRACE_BOOKMARK(TEXT("StartAction:%s"), *GetNameSafe(Action));
 
 			//客户端会在本地执行一次
 			Action->StartAction(Instigator);

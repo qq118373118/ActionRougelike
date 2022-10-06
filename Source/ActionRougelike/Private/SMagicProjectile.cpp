@@ -17,6 +17,9 @@ ASMagicProjectile::ASMagicProjectile()
 
 	MoveComp->InitialSpeed = 8000.f;
 
+	//初始化生命周期
+	InitialLifeSpan = 10.0f;
+
 	DamageValue = -20.0f;
 
 }
